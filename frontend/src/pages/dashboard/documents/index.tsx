@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { ReactElement, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -13,8 +13,9 @@ import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Upload, LinkIcon, FileText, Globe, Trash2, Eye, Bot, ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import { DashboardLayout } from '@/pages/dashboard/layout'
 
-export default function DocumentsPage() {
+function DocumentsPage() {
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isUploading, setIsUploading] = useState(false)
   const [documents, setDocuments] = useState([
@@ -246,3 +247,9 @@ export default function DocumentsPage() {
     </div>
   )
 }
+
+DocumentsPage.getLayout = function getLayout(page: ReactElement) {
+  return <DashboardLayout>{page}</DashboardLayout>
+}
+
+export default DocumentsPage;

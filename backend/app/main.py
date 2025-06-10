@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.auth import router as auth_router
 from app.api.dashboard import router as dashboard_router 
+from app.api.chatbots import router as chatbots_router 
 
 app = FastAPI(title="ChatFlow API")
 
@@ -23,6 +24,7 @@ app.add_middleware(
 # All routes in auth.py will be prefixed with /api
 app.include_router(auth_router, prefix="/api", tags=["Authentication"])
 app.include_router(dashboard_router, prefix="/api", tags=["Dashboard"])
+app.include_router(chatbots_router, prefix="/api", tags=["Chatbots"])
 
 @app.get("/")
 def read_root():

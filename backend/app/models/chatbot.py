@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field 
-from typing import Literal
+from typing import Literal, List
 
 class Chatbot(BaseModel):
     id: str

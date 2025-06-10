@@ -28,7 +28,7 @@ const NewChatbotPage: NextPageWithLayout = () => {
 
     try {
       const token = localStorage.getItem("access_token");
-      const response = await fetch(`${API_BASE_URL}/dashboard/chatbots`, {
+      const response = await fetch(`${API_BASE_URL}/chatbots`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
