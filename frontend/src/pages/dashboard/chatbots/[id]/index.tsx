@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { ReactElement, useState } from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { Bot, ArrowLeft, Settings, FileText, Code, BarChart3, MessageSquare, Trash2, Save, Eye, ExternalLink } from 'lucide-react'
-
+import { DashboardLayout } from '@/pages/dashboard/layout'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -14,7 +14,8 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast"
+import { useRouter } from "next/router"
 
 // Mock data for a single chatbot
 const mockChatbot = {
@@ -59,9 +60,9 @@ const mockChatbot = {
   }
 }
 
-export default function ChatbotDetailsPage() {
-  const params = useParams()
-  const { id } = params
+function ChatbotDetailsPage() {
+  const router = useRouter()
+  const { id } = router.query
   const { toast } = useToast()
   
   // In a real app, you would fetch the chatbot data based on the ID
@@ -471,3 +472,9 @@ export default function ChatbotDetailsPage() {
     </div>
   )
 }
+
+ChatbotDetailsPage.getLayout = function getLayout(page: ReactElement) {
+  return <DashboardLayout>{page}</DashboardLayout>;
+};
+
+export default ChatbotDetailsPage;

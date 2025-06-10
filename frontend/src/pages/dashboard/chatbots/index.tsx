@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { ReactElement, useState } from "react"
 import Link from "next/link"
 import { Bot, Plus, Search, Filter, MoreHorizontal, Trash2, Edit, Eye } from 'lucide-react'
 
@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { DashboardLayout } from '@/pages/dashboard/layout'
 
 interface Chatbot {
   id: string
@@ -88,7 +89,7 @@ const mockChatbots: Chatbot[] = [
   },
 ]
 
-export default function ChatbotsPage() {
+function ChatbotsPage() {
   const [chatbots, setChatbots] = useState<Chatbot[]>(mockChatbots)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
@@ -256,3 +257,9 @@ export default function ChatbotsPage() {
     </div>
   )
 }
+
+ChatbotsPage.getLayout = function getLayout(page: ReactElement) {
+  return <DashboardLayout>{page}</DashboardLayout>
+}
+
+export default ChatbotsPage;
