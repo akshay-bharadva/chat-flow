@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react"
 
+const API_BASE_URL = "http://localhost:8000/api"
+
 interface User {
   id: string
   name: string
@@ -26,16 +28,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Check if user is logged in
-    const checkAuth = async () => {
+    // Check for user data in localStorage on initial load
+    const checkAuth = () => {
       try {
-        // In a real app, this would be an API call to verify the session
         const storedUser = localStorage.getItem("user")
         if (storedUser) {
           setUser(JSON.parse(storedUser))
         }
       } catch (error) {
-        console.error("Authentication error:", error)
+        console.error("Authentication check error:", error)
+        localStorage.clear() // Clear corrupted storage
       } finally {
         setIsLoading(false)
       }
@@ -47,18 +49,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string) => {
     setIsLoading(true)
     try {
-      // In a real app, this would be an API call to your backend
-      // Simulating a successful login
-      const mockUser = {
-        id: "user_123",
-        name: "John Doe",
-        email,
-        role: "admin",
-        plan: "pro"
+      const response = await fetch(`${API_BASE_URL}/auth/signin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || 'Login failed')
       }
-      
-      setUser(mockUser)
-      localStorage.setItem("user", JSON.stringify(mockUser))
+
+      const data = await response.json()
+      const loggedInUser = data.user
+
+      setUser(loggedInUser)
+      localStorage.setItem("user", JSON.stringify(loggedInUser))
+      localStorage.setItem("access_token", data.access_token)
+
     } catch (error) {
       console.error("Login error:", error)
       throw error
@@ -70,29 +78,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signup = async (name: string, email: string, password: string) => {
     setIsLoading(true)
     try {
-      // In a real app, this would be an API call to your backend
-      // Simulating a successful signup
-      const mockUser = {
-        id: "user_" + Math.random().toString(36).substr(2, 9),
-        name,
-        email,
-        role: "user",
-        plan: "free"
+      const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Signup failed');
       }
-      
-      setUser(mockUser)
-      localStorage.setItem("user", JSON.stringify(mockUser))
+
+      // After successful signup, immediately log the user in
+      await login(email, password);
+
     } catch (error) {
-      console.error("Signup error:", error)
-      throw error
+      console.error("Signup error:", error);
+      throw error;
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
   const logout = () => {
     setUser(null)
     localStorage.removeItem("user")
+    localStorage.removeItem("access_token")
+    // In a real app, you might want to call a backend endpoint to invalidate the token
   }
 
   return (

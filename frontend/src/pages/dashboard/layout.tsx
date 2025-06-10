@@ -1,31 +1,26 @@
-"use client"
+"use client" // This directive might not be needed here, but is good practice for components with hooks
 
 import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/router"
+import { useAuth } from "@/components/auth-provider"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import { Breadcrumb } from "@/components/breadcrumb"
-import { useAuth } from "@/components/auth-provider"
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    // Redirect to login if not authenticated
     if (!isLoading && !isAuthenticated) {
       router.push("/auth/signin")
     }
   }, [isAuthenticated, isLoading, router])
 
-  if (isLoading) {
+  if (isLoading || !isAuthenticated) {
     return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       </div>
     )
   }

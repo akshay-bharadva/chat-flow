@@ -1,10 +1,13 @@
+import type { ReactElement } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Bot, FileText, Settings, Code, Plus, BarChart3, Users, MessageSquare } from "lucide-react"
 import Link from "next/link"
+import { DashboardLayout } from '@/pages/dashboard/layout'
 
-export default function DashboardPage() {
+
+function DashboardPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
@@ -212,3 +215,15 @@ export default function DashboardPage() {
     </div>
   )
 }
+
+
+
+DashboardPage.getLayout = function getLayout(page: ReactElement) {
+  return (
+    <DashboardLayout>
+      {page}
+    </DashboardLayout>
+  )
+}
+
+export default DashboardPage

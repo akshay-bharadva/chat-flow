@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/components/auth-provider"
 
 const formSchema = z.object({
@@ -42,7 +42,7 @@ export default function SignInPage() {
       await login(data.email, data.password)
       toast({
         title: "Sign in successful",
-        description: "Welcome back to ChatBot Builder!",
+        description: "Welcome back!",
       })
       router.push("/dashboard")
     } catch (error) {

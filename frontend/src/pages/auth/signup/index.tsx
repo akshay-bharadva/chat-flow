@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/router"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -13,9 +13,10 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Checkbox } from "@/components/ui/checkbox"
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/components/auth-provider"
 
+// Zod schema for validation, including password confirmation
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -26,10 +27,10 @@ const formSchema = z.object({
   }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
-  path: ["confirmPassword"],
-})
+  path: ["confirmPassword"], // This error will be shown under the confirmPassword field
+});
 
-type FormValues = z.infer<typeof formSchema>
+type FormValues = z.infer<typeof formSchema>;
 
 export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -53,15 +54,15 @@ export default function SignUpPage() {
     try {
       await signup(data.name, data.email, data.password)
       toast({
-        title: "Account created",
-        description: "Welcome to ChatBot Builder!",
+        title: "Account created!",
+        description: "Welcome to ChatFlow!",
       })
       router.push("/dashboard")
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Sign up failed",
-        description: "There was a problem creating your account.",
+        description: error.message || "There was a problem creating your account.",
       })
     } finally {
       setIsLoading(false)
@@ -73,10 +74,10 @@ export default function SignUpPage() {
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <div className="flex justify-center">
-            <Bot className="h-12 w-12 text-blue-600" />
+            <Bot className="h-12 w-12 text-primary" />
           </div>
-          <h1 className="mt-4 text-3xl font-bold">ChatBot Builder</h1>
-          <p className="mt-2 text-gray-600">Create your account</p>
+          <h1 className="mt-4 text-3xl font-bold">ChatFlow</h1>
+          <p className="mt-2 text-muted-foreground">Create your account</p>
         </div>
 
         <Card>
@@ -143,22 +144,15 @@ export default function SignUpPage() {
                   control={form.control}
                   name="terms"
                   render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md p-4">
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md pt-4">
                       <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                       <div className="space-y-1 leading-none">
                         <FormLabel>
                           I agree to the{" "}
-                          <Link href="/terms" className="text-blue-600 hover:underline">
+                          <Link href="/terms" className="text-primary hover:underline">
                             terms of service
-                          </Link>{" "}
-                          and{" "}
-                          <Link href="/privacy" className="text-blue-600 hover:underline">
-                            privacy policy
                           </Link>
                         </FormLabel>
                         <FormMessage />
@@ -182,7 +176,7 @@ export default function SignUpPage() {
           <CardFooter>
             <div className="text-center w-full text-sm">
               Already have an account?{" "}
-              <Link href="/auth/signin" className="text-blue-600 hover:underline">
+              <Link href="/auth/signin" className="text-primary hover:underline">
                 Sign in
               </Link>
             </div>
