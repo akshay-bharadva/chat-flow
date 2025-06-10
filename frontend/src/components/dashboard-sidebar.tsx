@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Bot, FileText, Settings, BarChart3, CreditCard, Users, MessageSquare, Home, PlusCircle, LogOut, HelpCircle } from 'lucide-react'
+import { Bot, Settings, BarChart3, CreditCard, Users, MessageSquare, Home, PlusCircle, LogOut, HelpCircle } from 'lucide-react'
 
 import {
   Sidebar,
@@ -58,14 +58,6 @@ export function DashboardSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={isActive("/dashboard/documents")}>
-                  <Link href="/dashboard/documents">
-                    <FileText className="h-4 w-4" />
-                    <span>Documents</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={isActive("/dashboard/analytics")}>
                   <Link href="/dashboard/analytics">
                     <BarChart3 className="h-4 w-4" />
@@ -94,14 +86,6 @@ export function DashboardSidebar() {
                   <Link href="/dashboard/billing">
                     <CreditCard className="h-4 w-4" />
                     <span>Billing</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={isActive("/dashboard/team")}>
-                  <Link href="/dashboard/team">
-                    <Users className="h-4 w-4" />
-                    <span>Team</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

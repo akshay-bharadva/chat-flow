@@ -4,8 +4,23 @@ export interface Chatbot {
   id: string;
   name: string;
   status: ChatbotStatus;
-  description: string;
+  description: string | null;
   conversations: number;
   accuracy: number;
-  lastUpdated: string;
+  lastUpdated: string; // From alias="last_updated"
+  greeting: string | null;
+  primaryColor: string | null;
+  position: string | null;
+  showAvatar: boolean | null;
+  analytics: Record<string, any> | null;
+}
+
+// Type for updating a chatbot's settings
+export interface ChatbotUpdate {
+  name?: string;
+  description?: string;
+  greeting?: string;
+  primary_color?: string;
+  position?: string;
+  show_avatar?: boolean;
 }

@@ -1,13 +1,13 @@
 "use client"
 
-import { ReactElement, useState } from "react"
+import { ReactElement, useState, useEffect, useCallback } from "react"
 import Link from "next/link"
-import { Bot, Plus, Search, Filter, MoreHorizontal, Trash2, Edit, Eye } from 'lucide-react'
+import { Bot, Plus, Search, Filter, MoreHorizontal, Trash2, Edit, Eye, AlertCircle } from 'lucide-react'
+import { useRouter } from "next/router"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,96 +24,186 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { DashboardLayout } from '@/pages/dashboard/layout'
+import { StatusBadge } from "@/components/ui/status-badge"
+import { Chatbot } from '@/types/chatbot'
+import { Skeleton } from "@/components/ui/skeleton"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
-interface Chatbot {
-  id: string
-  name: string
-  description: string
-  status: "active" | "draft" | "archived"
-  type: string
-  conversations: number
-  accuracy: number
-  lastUpdated: string
-}
-
-const mockChatbots: Chatbot[] = [
-  {
-    id: "bot-1",
-    name: "Customer Support Bot",
-    description: "E-commerce support chatbot",
-    status: "active",
-    type: "Support",
-    conversations: 234,
-    accuracy: 89,
-    lastUpdated: "2023-05-15",
-  },
-  {
-    id: "bot-2",
-    name: "Product FAQ Bot",
-    description: "Product information assistant",
-    status: "active",
-    type: "FAQ",
-    conversations: 156,
-    accuracy: 92,
-    lastUpdated: "2023-05-10",
-  },
-  {
-    id: "bot-3",
-    name: "Documentation Helper",
-    description: "Technical documentation bot",
-    status: "draft",
-    type: "Documentation",
-    conversations: 0,
-    accuracy: 0,
-    lastUpdated: "2023-05-05",
-  },
-  {
-    id: "bot-4",
-    name: "Sales Assistant",
-    description: "Helps with product recommendations",
-    status: "active",
-    type: "Sales",
-    conversations: 87,
-    accuracy: 85,
-    lastUpdated: "2023-04-28",
-  },
-  {
-    id: "bot-5",
-    name: "HR Onboarding Bot",
-    description: "Helps new employees with onboarding",
-    status: "archived",
-    type: "HR",
-    conversations: 45,
-    accuracy: 78,
-    lastUpdated: "2023-03-15",
-  },
-]
+const API_BASE_URL = "http://localhost:8000/api";
 
 function ChatbotsPage() {
-  const [chatbots, setChatbots] = useState<Chatbot[]>(mockChatbots)
+  const [chatbots, setChatbots] = useState<Chatbot[]>([])
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
+  const router = useRouter()
+
+  const fetchChatbots = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) throw new Error("Authentication token not found. Please sign in.");
+      
+      const response = await fetch(`${API_BASE_URL}/chatbots`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to fetch chatbots.");
+      }
+
+      const data: Chatbot[] = await response.json();
+      setChatbots(data);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchChatbots();
+  }, [fetchChatbots]);
 
   const filteredChatbots = chatbots.filter((bot) => {
     const matchesSearch = bot.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                         bot.description.toLowerCase().includes(searchQuery.toLowerCase())
+                         (bot.description && bot.description.toLowerCase().includes(searchQuery.toLowerCase()));
     
-    const matchesStatus = statusFilter === "all" || bot.status === statusFilter
+    const matchesStatus = statusFilter === "all" || bot.status === statusFilter;
     
-    return matchesSearch && matchesStatus
-  })
+    return matchesSearch && matchesStatus;
+  });
 
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case "active":
-        return "default"
-      case "draft":
-        return "secondary"
-      case "archived":
-        return "outline"
-      default:
-        return "secondary"
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className="space-y-6">
+          {[...Array(3)].map((_, i) => (
+            <Skeleton key={i} className="h-40 w-full" />
+          ))}
+        </div>
+      )
     }
+
+    if (error) {
+       return (
+        <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error loading chatbots</AlertTitle>
+            <AlertDescription>
+                {error}
+                <Button variant="link" onClick={fetchChatbots} className="p-0 h-auto ml-2">
+                  Try again
+                </Button>
+            </AlertDescription>
+        </Alert>
+      );
+    }
+    
+    if (chatbots.length === 0) {
+        return (
+          <Card className="p-12 text-center">
+            <div className="mx-auto w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+              <Bot className="h-6 w-6 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">No chatbots created yet</h3>
+            <p className="text-gray-500 mb-6">
+              Get started by creating your first chatbot to manage your customer interactions.
+            </p>
+            <Button asChild>
+              <Link href="/dashboard/chatbots/new">
+                <Plus className="mr-2 h-4 w-4" />
+                Create Your First Chatbot
+              </Link>
+            </Button>
+          </Card>
+        )
+    }
+
+    if (filteredChatbots.length === 0) {
+      return (
+          <Card className="p-12 text-center">
+          <div className="mx-auto w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+            <Bot className="h-6 w-6 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-semibold mb-2">No chatbots found</h3>
+          <p className="text-gray-500 mb-6">
+            No chatbots match your search criteria. Try a different search or filter.
+          </p>
+        </Card>
+      )
+    }
+
+    return (
+      <div className="grid gap-6">
+        {filteredChatbots.map((bot) => (
+          <Card key={bot.id} className="overflow-hidden hover:shadow-md transition-shadow">
+            <div className="flex flex-col md:flex-row">
+              <div className="flex items-center p-6 md:border-r md:w-64">
+                <div className="bg-blue-100 p-3 rounded-lg mr-4">
+                  <Bot className="h-8 w-8 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg hover:text-blue-600">
+                    <Link href={`/dashboard/chatbots/${bot.id}`}>{bot.name}</Link>
+                  </h3>
+                  <StatusBadge status={bot.status as any} className="mt-1" />
+                </div>
+              </div>
+              
+              <div className="flex-1 p-6">
+                <div className="flex flex-col md:flex-row justify-between">
+                  <div>
+                    <p className="text-gray-600 mb-2">{bot.description}</p>
+                    <p className="text-sm text-gray-500">Conversations: {bot.conversations}</p>
+                  </div>
+                  
+                  <div className="mt-4 md:mt-0 flex flex-col items-start md:items-end">
+                    <div className="text-left md:text-right mb-2">
+                      <p className="text-sm font-medium">{bot.accuracy}% accuracy</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Last updated: {new Date(bot.lastUpdated).toLocaleDateString()}
+                      </p>
+                    </div>
+                    
+                    <div className="flex space-x-2">
+                      <Button variant="outline" size="sm" asChild>
+                        <Link href={`/dashboard/chatbots/${bot.id}`}>
+                          <Eye className="h-4 w-4 mr-1" />
+                          View
+                        </Link>
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                           <DropdownMenuItem onSelect={() => router.push(`/dashboard/chatbots/${bot.id}`)}>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit
+                           </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    )
   }
 
   return (
@@ -145,7 +235,7 @@ function ChatbotsPage() {
             </div>
             <div className="flex gap-2">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-full md:w-[180px]">
                   <Filter className="mr-2 h-4 w-4" />
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
@@ -160,100 +250,8 @@ function ChatbotsPage() {
           </div>
         </CardContent>
       </Card>
-
-      {filteredChatbots.length > 0 ? (
-        <div className="grid gap-6">
-          {filteredChatbots.map((bot) => (
-            <Card key={bot.id} className="overflow-hidden">
-              <div className="flex flex-col md:flex-row">
-                <div className="flex items-center p-6 md:border-r md:w-64">
-                  <div className="bg-blue-100 p-3 rounded-lg mr-4">
-                    <Bot className="h-8 w-8 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg">{bot.name}</h3>
-                    <Badge variant={getStatusBadgeVariant(bot.status)} className="mt-1">
-                      {bot.status.charAt(0).toUpperCase() + bot.status.slice(1)}
-                    </Badge>
-                  </div>
-                </div>
-                
-                <div className="flex-1 p-6">
-                  <div className="flex flex-col md:flex-row justify-between">
-                    <div>
-                      <p className="text-gray-600 mb-2">{bot.description}</p>
-                      <p className="text-sm text-gray-500">Type: {bot.type}</p>
-                    </div>
-                    
-                    <div className="mt-4 md:mt-0 flex flex-col items-end">
-                      <div className="text-right mb-2">
-                        {bot.status === "active" && (
-                          <>
-                            <p className="text-sm font-medium">{bot.accuracy}% accuracy</p>
-                            <p className="text-xs text-gray-600">{bot.conversations} conversations</p>
-                          </>
-                        )}
-                        <p className="text-xs text-gray-500 mt-1">Last updated: {bot.lastUpdated}</p>
-                      </div>
-                      
-                      <div className="flex space-x-2">
-                        <Button variant="outline" size="sm" asChild>
-                          <Link href={`/dashboard/chatbots/${bot.id}`}>
-                            <Eye className="h-4 w-4 mr-1" />
-                            View
-                          </Link>
-                        </Button>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="sm">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Eye className="h-4 w-4 mr-2" />
-                              Preview
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-red-600">
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <Card className="p-12 text-center">
-          <div className="mx-auto w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-            <Bot className="h-6 w-6 text-gray-400" />
-          </div>
-          <h3 className="text-lg font-semibold mb-2">No chatbots found</h3>
-          <p className="text-gray-500 mb-6">
-            {searchQuery || statusFilter !== "all"
-              ? "No chatbots match your search criteria"
-              : "You haven't created any chatbots yet"}
-          </p>
-          <Button asChild>
-            <Link href="/dashboard/chatbots/new">
-              <Plus className="mr-2 h-4 w-4" />
-              Create Your First Chatbot
-            </Link>
-          </Button>
-        </Card>
-      )}
+      
+      {renderContent()}
     </div>
   )
 }
