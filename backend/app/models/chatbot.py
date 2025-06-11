@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, ConfigDict
-from typing import Literal, Optional, Any
+from typing import Literal, Optional, Any, List
 
 class Chatbot(BaseModel):
     model_config = ConfigDict(
@@ -21,6 +21,7 @@ class Chatbot(BaseModel):
     showAvatar: Optional[bool] = Field(default=None, alias="show_avatar")
     enableTyping: Optional[bool] = Field(default=None, alias="enable_typing")
     responseDelay: Optional[int] = Field(default=None, alias="response_delay")
+    allowedDomain: Optional[str] = Field(default=None, alias="allowed_domain")
     analytics: Optional[dict[str, Any]] = None
 
 class ChatbotCreate(BaseModel):
@@ -41,3 +42,4 @@ class ChatbotUpdate(BaseModel):
     showAvatar: Optional[bool] = Field(default=None, alias="show_avatar")
     enableTyping: Optional[bool] = Field(default=None, alias="enable_typing")
     responseDelay: Optional[int] = Field(default=None, alias="response_delay")
+    allowedDomain: Optional[str] = Field(default=None, alias="allowed_domain")

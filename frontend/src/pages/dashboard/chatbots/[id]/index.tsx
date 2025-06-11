@@ -301,13 +301,14 @@ function ChatbotDetailsPage() {
                 name: data.name,
                 description: data.description || "",
                 greeting: data.greeting || "",
-                primary_color: data.primaryColor || "",
+                primaryColor: data.primaryColor || "",
                 position: data.position || "",
-                show_avatar: data.showAvatar || undefined,
-                placeholder: data.placeholder,
+                showAvatar: data.showAvatar || undefined,
+                placeholder: data.placeholder || undefined,
                 size: data.size || "",
                 enableTyping: data.enableTyping || undefined,
                 responseDelay: data.responseDelay || 0,
+                allowedDomain: data.allowedDomain || ""
             })
         } catch (err: any) {
             setError(err.message)
@@ -345,6 +346,11 @@ function ChatbotDetailsPage() {
             const token = localStorage.getItem("access_token")
             if (!token || !chatbotId) throw new Error("Missing credentials or chatbot ID.")
 
+            const payload = { ...formData };
+            if (payload.allowedDomain === '') {
+                payload.allowedDomain = "your-domain.com";
+            }
+
             const response = await fetch(`${API_BASE_URL}/chatbots/${chatbotId}`, {
                 method: 'PATCH',
                 headers: {
@@ -361,6 +367,7 @@ function ChatbotDetailsPage() {
 
             const updatedChatbot = await response.json();
             setChatbot(updatedChatbot);
+            setFormData(prev => ({ ...prev, allowedDomain: updatedChatbot.allowedDomain || '' }));
 
             toast({
                 title: "Changes saved",
@@ -396,7 +403,7 @@ function ChatbotDetailsPage() {
 <script>
   window.ChatBotConfig = {
     botId: "${chatbotId}",
-    domain: "your-domain.com",
+    domain: domain: "${formData.allowedDomain || "your-domain.com"}",
     position: "bottom-right",
     primaryColor: "#3B82F6",
     greeting: "Hello! How can I help you today?"
@@ -412,7 +419,7 @@ export default function MyComponent() {
     // Load ChatBot Builder widget
     window.ChatBotConfig = {
       botId: "${chatbotId}",
-      domain: "your-domain.com",
+      domain: domain: "${formData.allowedDomain || "your-domain.com"}",
       position: "bottom-right",
       primaryColor: "#3B82F6",
       greeting: "Hello! How can I help you today?"
@@ -506,8 +513,8 @@ export default function MyComponent() {
                                         <div>
                                             <Label htmlFor="primaryColor">Primary Color</Label>
                                             <div className="flex space-x-2">
-                                                <Input type="color" value={formData.primary_color || '#000000'} onChange={(e) => setFormData({ ...formData, primary_color: e.target.value })} className="w-16 h-10 p-1" />
-                                                <Input id="primaryColor" name="primaryColor" value={formData.primary_color || ''} onChange={handleInputChange} />
+                                                <Input type="color" value={formData.primaryColor || '#000000'} onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })} className="w-16 h-10 p-1" />
+                                                <Input id="primaryColor" name="primaryColor" value={formData.primaryColor || ''} onChange={handleInputChange} />
                                             </div>
                                         </div>
                                     </div>
@@ -548,7 +555,7 @@ export default function MyComponent() {
                                     </div> */}
                                     <div className="flex items-center justify-between pt-4 border-t">
                                         <p className="font-medium">Show Avatar</p>
-                                        <Switch id="showAvatar" name="showAvatar" checked={formData.show_avatar} onCheckedChange={(c) => handleSwitchChange("show_avatar", c)} />
+                                        <Switch id="showAvatar" name="showAvatar" checked={formData.showAvatar} onCheckedChange={(c) => handleSwitchChange("showAvatar", c)} />
 
                                     </div>
                                 </CardContent>
@@ -635,11 +642,11 @@ export default function MyComponent() {
                                             <div
                                                 className={`rounded-full shadow-lg cursor-pointer ${formData.size === "small" ? "w-12 h-12" : formData.size === "medium" ? "w-16 h-16" : "w-20 h-20"
                                                     }`}
-                                                style={{ backgroundColor: formData.primary_color }}
+                                                style={{ backgroundColor: formData.primaryColor }}
                                             >
                                                 <Button
                                                     className="rounded-full shadow-lg"
-                                                    style={{ backgroundColor: formData.primary_color, width: formData.size === 'small' ? '48px' : formData.size === 'large' ? '80px' : '64px', height: formData.size === 'small' ? '48px' : formData.size === 'large' ? '80px' : '64px' }}
+                                                    style={{ backgroundColor: formData.primaryColor, width: formData.size === 'small' ? '48px' : formData.size === 'large' ? '80px' : '64px', height: formData.size === 'small' ? '48px' : formData.size === 'large' ? '80px' : '64px' }}
                                                     onClick={() => setPreviewOpen(!previewOpen)}
                                                 >
                                                     <MessageSquare
@@ -651,15 +658,15 @@ export default function MyComponent() {
                                             {/* Chat Window (when open) */}
                                             {previewOpen && (
                                                 <div className="absolute bottom-20 right-0 w-80 h-96 bg-white rounded-lg shadow-xl border">
-                                                    <div className="p-4 rounded-t-lg text-white" style={{ backgroundColor: formData.primary_color }}>
+                                                    <div className="p-4 rounded-t-lg text-white" style={{ backgroundColor: formData.primaryColor }}>
                                                         <h3 className="font-semibold">{formData.name}</h3>
                                                     </div>
                                                     <div className="p-4 flex-1">
                                                         <div className="flex items-start space-x-2 mb-4">
-                                                            {formData.show_avatar && (
+                                                            {formData.showAvatar && (
                                                                 <div
                                                                     className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm"
-                                                                    style={{ backgroundColor: formData.primary_color }}
+                                                                    style={{ backgroundColor: formData.primaryColor }}
                                                                 >
                                                                     <Bot className="w-4 h-4" />
                                                                 </div>
@@ -693,7 +700,6 @@ export default function MyComponent() {
                             <CardDescription>Copy the embed code and add it to your website</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            {/* <CodeBlock code={embedCode} /> */}
                             <div className="grid lg:grid-cols-3 gap-8">
                                 {/* Configuration */}
                                 <div className="lg:col-span-1">
@@ -708,9 +714,11 @@ export default function MyComponent() {
                                                 <Input
                                                     id="domain"
                                                     placeholder="example.com"
-                                                // value={domain}
-                                                // onChange={(e) => setDomain(e.target.value)}
+                                                    name="allowedDomain"
+                                                    value={formData.allowedDomain || ''}
+                                                    onChange={handleInputChange}
                                                 />
+                                                <p className="text-xs text-muted-foreground mt-2">Do not include "https://www." or a trailing "/".</p>
                                                 <p className="text-xs text-gray-600 mt-1">Optional: Restrict chatbot to specific domain</p>
                                             </div>
 

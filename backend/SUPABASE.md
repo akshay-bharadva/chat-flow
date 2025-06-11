@@ -15,6 +15,7 @@ CREATE TABLE public.chatbots (
   position text DEFAULT 'bottom-right'::text,
   size text DEFAULT 'medium'::text,
   show_avatar boolean DEFAULT true,
+  allowed_domain text DEFAULT "your-domain.com"::text, -- Whitelisted domains
   enable_typing boolean DEFAULT true,
   response_delay integer DEFAULT 500, -- in millisecond
   analytics jsonb DEFAULT '{}'::jsonb,

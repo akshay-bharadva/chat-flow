@@ -7,28 +7,29 @@ export interface Chatbot {
   description: string | null;
   conversations: number;
   accuracy: number;
-  lastUpdated: string; // From alias="last_updated"
+  lastUpdated: string;
   greeting: string | null;
   primaryColor: string | null;
   position: string | null;
   showAvatar: boolean | null;
   analytics: Record<string, any> | null;
-  placeholder?: string;
-  size?: string;
-  enableTyping?: boolean;
-  responseDelay?: number;
+  placeholder?: string | null;
+  size: string | null;
+  enableTyping: boolean | null;
+  responseDelay: number | null;
+  allowedDomain: string | null;
 }
 
-// Type for updating a chatbot's settings
 export interface ChatbotUpdate {
   name?: string;
   description?: string;
   greeting?: string;
-  primary_color?: string;
+  primaryColor?: string;
   position?: string;
-  show_avatar?: boolean;
+  showAvatar?: boolean;
   placeholder?: string;
   size?: string;
   enableTyping?: boolean;
   responseDelay?: number;
+  allowedDomain?: string;
 }
