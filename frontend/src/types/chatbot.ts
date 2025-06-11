@@ -13,6 +13,10 @@ export interface Chatbot {
   position: string | null;
   showAvatar: boolean | null;
   analytics: Record<string, any> | null;
+  placeholder?: string;
+  size?: string;
+  enableTyping?: boolean;
+  responseDelay?: number;
 }
 
 // Type for updating a chatbot's settings
@@ -23,4 +27,8 @@ export interface ChatbotUpdate {
   primary_color?: string;
   position?: string;
   show_avatar?: boolean;
+  placeholder?: string;
+  size?: string;
+  enableTyping?: boolean;
+  responseDelay?: number;
 }

@@ -10,9 +10,13 @@ CREATE TABLE public.chatbots (
   name text NOT NULL,
   description text,
   greeting text DEFAULT 'Hello! How can I help you today?'::text,
+  placeholder text DEFAULT 'Type your message...'::text,
   primary_color text DEFAULT '#3B82F6'::text,
   position text DEFAULT 'bottom-right'::text,
+  size text DEFAULT 'medium'::text,
   show_avatar boolean DEFAULT true,
+  enable_typing boolean DEFAULT true,
+  response_delay integer DEFAULT 500, -- in millisecond
   analytics jsonb DEFAULT '{}'::jsonb,
   status text NOT NULL DEFAULT 'draft', -- e.g., 'draft', 'active', 'archived'
   conversations integer NOT NULL DEFAULT 0,
