@@ -3,3 +3,5 @@ from app.core.config import settings
 
 # Initialize the Supabase client
 supabase_client: Client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+
+supabase_public_client: Client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
