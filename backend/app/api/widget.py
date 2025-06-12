@@ -1,9 +1,10 @@
 from fastapi import APIRouter, HTTPException, status, Request
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from urllib.parse import urlparse 
 
-from app.db.supabase import supabase_client
+# Import the new public client
+from app.db.supabase import supabase_public_client
 
 
 class WidgetConfigResponse(BaseModel):
@@ -15,7 +16,7 @@ class WidgetConfigResponse(BaseModel):
     size: Optional[str]
     showAvatar: Optional[bool]
     enableTyping: Optional[bool]
-    initialMessages: Optional[list[str]]
+    initialMessages: Optional[List[str]]
 
 router = APIRouter()
 
@@ -24,6 +25,7 @@ def get_widget_config(bot_id: str, request: Request):
     """
     Public endpoint for the widget.js script to fetch a chatbot's configuration.
     It performs a security check against the whitelisted domain.
+    This endpoint uses a separate, unauthenticated Supabase client.
     """
 
     origin = request.headers.get("origin")
@@ -31,9 +33,7 @@ def get_widget_config(bot_id: str, request: Request):
 
     if origin == "null" or origin is None:
         if not referer:
-            
              raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Origin or Referer header is required.")
-        
         source_url = referer
     else:
         source_url = origin
@@ -45,8 +45,11 @@ def get_widget_config(bot_id: str, request: Request):
             request_domain = request_domain[4:]
     except:
         request_domain = None
-            response = (
-        supabase_client.table('chatbots')
+    
+    # ** THE FIX IS HERE **
+    # Use the dedicated public client for this query.
+    response = (
+        supabase_public_client.table('chatbots')
         .select("name, greeting, placeholder, primary_color, position, size, show_avatar, enable_typing, allowed_domain, initial_messages")
         .eq('id', bot_id)
         .eq('status', 'active')
@@ -58,11 +61,12 @@ def get_widget_config(bot_id: str, request: Request):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Active chatbot not found.")
 
     chatbot = response.data
-        if chatbot.get("allowed_domain") and chatbot["allowed_domain"].strip() != "":
+    
+    if chatbot.get("allowed_domain") and chatbot["allowed_domain"].strip() != "":
         if not request_domain or request_domain != chatbot["allowed_domain"].strip():
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="This chatbot is not authorized for this domain.")
         
-            config_data = {
+    config_data = {
         "name": chatbot.get("name"),
         "greeting": chatbot.get("greeting"),
         "placeholder": chatbot.get("placeholder"),

@@ -187,4 +187,11 @@ USING (bucket_id = 'documents-storage' AND auth.uid() = owner);
 CREATE POLICY "Allow individual delete access"
 ON storage.objects FOR DELETE
 USING (bucket_id = 'documents-storage' AND auth.uid() = owner);
+
+
+-- Allow public read-only access to chatbots that are 'active'
+CREATE POLICY "Allow public read for active chatbots"
+ON public.chatbots FOR SELECT
+USING (status = 'active');
+-- This policy ensures that anyone (including your public widget endpoint) can read the details of a chatbot, but only if its status is set to active. This prevents configurations for draft or archived bots from being exposed publicly.
 ```

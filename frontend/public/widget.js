@@ -2,7 +2,7 @@
   "use strict";
 
   const API_BASE_URL = "http://localhost:8000/api";
-  const IFRAME_BASE_URL = "http://localhost:3001"; // URL of our Next.js app for the iframe content
+  const IFRAME_BASE_URL = "http://localhost:3000"; // URL of our Next.js app for the iframe content
 
   let state = {
     isOpen: false,
