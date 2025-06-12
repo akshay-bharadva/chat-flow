@@ -4,13 +4,15 @@ from app.api.auth import router as auth_router
 from app.api.dashboard import router as dashboard_router 
 from app.api.chatbots import router as chatbots_router 
 from app.api.documents import router as documents_router 
+from app.api.widget import router as widget_router
 
 app = FastAPI(title="ChatFlow API")
 
 # Configure CORS
 origins = [
-    "http://localhost:3000",  # Your frontend's origin
+    "http://localhost:3000",
     "http://localhost:3001",
+    "*"
 ]
 
 app.add_middleware(
@@ -21,12 +23,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include the authentication router
-# All routes in auth.py will be prefixed with /api
 app.include_router(auth_router, prefix="/api", tags=["Authentication"])
 app.include_router(dashboard_router, prefix="/api", tags=["Dashboard"])
 app.include_router(chatbots_router, prefix="/api", tags=["Chatbots"])
 app.include_router(documents_router, prefix="/api", tags=["Documents"]) 
+app.include_router(widget_router, prefix="/api", tags=["Widget"])
 
 @app.get("/")
 def read_root():

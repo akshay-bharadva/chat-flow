@@ -10,6 +10,7 @@ CREATE TABLE public.chatbots (
   name text NOT NULL,
   description text,
   greeting text DEFAULT 'Hello! How can I help you today?'::text,
+  initial_messages text[] DEFAULT ARRAY[]::text[],
   placeholder text DEFAULT 'Type your message...'::text,
   primary_color text DEFAULT '#3B82F6'::text,
   position text DEFAULT 'bottom-right'::text,

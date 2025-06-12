@@ -14,6 +14,7 @@ class Chatbot(BaseModel):
     accuracy: int
     lastUpdated: str  = Field(alias="last_updated")
     greeting: Optional[str] = None
+    initialMessages: Optional[List[str]] = Field(default=[], alias="initial_messages")
     placeholder: Optional[str] = None
     primaryColor: Optional[str] = Field(default=None, alias="primary_color")
     position: Optional[str] = None
@@ -35,6 +36,7 @@ class ChatbotUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     greeting: Optional[str] = None
+    initialMessages: Optional[List[str]] = Field(default=None, alias="initial_messages")
     placeholder: Optional[str] = None
     primaryColor: Optional[str] = Field(default=None, alias="primary_color")
     position: Optional[str] = None
