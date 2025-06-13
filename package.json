@@ -1,0 +1,18 @@
+{
+  "name": "chat-flow",
+  "version": "1.0.0",
+  "description": "To create a comprehensive and accessible live chat and customer support platform that empowers businesses to engage with their website visitors in real-time, streamline support operations, and build lasting customer relationships. The core offering will be free, with advanced features and services available as paid add-ons.",
+  "scripts": {
+    "start": "node start-dev.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akshay-bharadva/chat-flow.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/akshay-bharadva/chat-flow/issues"
+  },
+  "homepage": "https://github.com/akshay-bharadva/chat-flow#readme"
+}

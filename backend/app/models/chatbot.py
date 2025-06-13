@@ -34,6 +34,7 @@ class ChatbotUpdate(BaseModel):
         populate_by_name=True,
     )
     name: Optional[str] = None
+    status: Optional[str] = None
     description: Optional[str] = None
     greeting: Optional[str] = None
     initialMessages: Optional[List[str]] = Field(default=None, alias="initial_messages")

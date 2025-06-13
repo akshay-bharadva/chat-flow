@@ -22,6 +22,7 @@ export interface Chatbot {
 
 export interface ChatbotUpdate {
   name?: string;
+  status?: ChatbotStatus;
   description?: string;
   greeting?: string;
   primaryColor?: string;

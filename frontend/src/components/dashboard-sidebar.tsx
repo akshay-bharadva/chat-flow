@@ -99,6 +99,16 @@ export function DashboardSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={isActive("/help")}>
+                  <Link href="/dashboard/components">
+                    <HelpCircle className="h-4 w-4" />
+                    <span>Page Components</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={isActive("/help")}>
                   <Link href="/help">
                     <HelpCircle className="h-4 w-4" />
                     <span>Documentation</span>

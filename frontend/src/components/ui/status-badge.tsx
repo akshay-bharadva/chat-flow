@@ -34,7 +34,8 @@ function StatusBadge({ className, status, children, ...props }: StatusBadgeProps
         <div className={cn("h-1.5 w-1.5 rounded-full", {
             "bg-green-500": status === "active",
             "bg-yellow-500": status === "processing",
-            "bg-gray-500": ["draft", "inactive", "archived"].includes(status),
+            "bg-orange-500": status === "archived",
+            "bg-gray-500": ["draft", "inactive"].includes(status),
             "bg-red-500": status === "failed",
         })} />
       {statusText}

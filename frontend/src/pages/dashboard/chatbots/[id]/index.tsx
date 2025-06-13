@@ -299,6 +299,7 @@ function ChatbotDetailsPage() {
             setChatbot(data)
             setFormData({
                 name: data.name,
+                status: data.status,
                 description: data.description || "",
                 greeting: data.greeting || "",
                 primaryColor: data.primaryColor || "",
@@ -526,7 +527,29 @@ export default function MyComponent() {
                                         <Label htmlFor="placeholder">Input Placeholder</Label>
                                         <Input id="placeholder" name="placeholder" value={formData.placeholder || ''} onChange={handleInputChange} />
                                     </div>
-                                    {/* <div className="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <Label>Status</Label>
+                                        <Select value={formData.status} onValueChange={(v) => handleSelectChange("status", v)}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select a status" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="active">
+                                                    <div className="flex items-center gap-2"><div className="h-2 w-2 bg-green-500 rounded-full" />Active</div>
+                                                </SelectItem>
+                                                <SelectItem value="draft">
+                                                    <div className="flex items-center gap-2"><div className="h-2 w-2 bg-gray-500 rounded-full" />Draft</div>
+                                                </SelectItem>
+                                                <SelectItem value="archived">
+                                                    <div className="flex items-center gap-2"><div className="h-2 w-2 bg-orange-500 rounded-full" />Archived</div>
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <p className="text-xs text-muted-foreground mt-2">
+                                            Active bots are live for users. Draft bots are for internal testing. Archived bots are saved but inactive.
+                                        </p>
+                                    </div>
+                                    <div className="grid md:grid-cols-2 gap-6">
                                         <div>
                                             <Label>Position</Label>
                                             <Select value={formData.position} onValueChange={(v) => handleSelectChange("position", v)}>
@@ -552,7 +575,7 @@ export default function MyComponent() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                    </div> */}
+                                    </div>
                                     <div className="flex items-center justify-between pt-4 border-t">
                                         <p className="font-medium">Show Avatar</p>
                                         <Switch id="showAvatar" name="showAvatar" checked={formData.showAvatar} onCheckedChange={(c) => handleSwitchChange("showAvatar", c)} />
