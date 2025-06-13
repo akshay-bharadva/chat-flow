@@ -55,7 +55,7 @@ export default function ChatbotIframePage() {
                 {messages.map((message, index) => (
                     <div key={index} className={`flex items-end gap-2 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                         {message.sender === 'bot' && config.showAvatar && <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0"><Bot size={20} className="text-gray-600"/></div>}
-                        <div className={`max-w-[80%] rounded-2xl p-3 text-sm ${message.sender === 'user' ? 'bg-blue-500 text-white rounded-br-none' : 'bg-gray-100 text-black rounded-bl-none'}`}>
+                        <div style={{ backgroundColor: message.sender === 'user' ? config.primaryColor : null }} className={`max-w-[80%] rounded-2xl p-3 text-sm ${message.sender === 'user' ? `text-white rounded-br-none` : 'bg-gray-100 text-black rounded-bl-none'}`}>
                            {message.text}
                         </div>
                     </div>
